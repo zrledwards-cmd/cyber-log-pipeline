@@ -15,6 +15,7 @@ graph LR
     C -->|Transforms to Parquet| D[(Local: data/processed/)]
     D -->|Fast Query Engine| E[DuckDB SQL]
     E -->|Alerts on Anomaly| F[Impossible Travel Detected]
+    D -->|Visualizes| G[Streamlit Live Dashboard]
 ```
 
 ## Tech Stack
@@ -22,15 +23,16 @@ graph LR
 *   **Storage / Datalake:** Local file system
 *   **Transformation (ETL):** Apache Spark (`pyspark` running locally)
 *   **Analysis:** DuckDB (OLAP in-process SQL engine)
+*   **Visualization Dashboard:** Streamlit
 *   **CI/CD:** GitHub Actions
 *   **Testing:** Pytest
 
 ## Project Structure
 *   [`generate_logs.py`](./generate_logs.py): Script that creates mock logs and writes them to `data/raw/`.
 *   [`local_etl.py`](./local_etl.py): PySpark script that enforces schema, adds date partitions, and writes highly-compressed Parquet files to `data/processed/`.
-*   [`duckdb_queries.py`](./duckdb_queries.py): Uses DuckDB to perform lightning-fast SQL analytics directly on the Parquet files to flag Impossible Travel.
+*   [`duckdb_queries.py`](./duckdb_queries.py): Uses DuckDB to perform lightning-fast SQL analytics directly on the Parquet files.
+*   [`dashboard.py`](./dashboard.py): An interactive Streamlit Web App providing a visual frontend to the DuckDB query engine.
 *   [`tests/`](./tests/): Unit tests for the data generation logic.
-*   [`.github/workflows/ci.yml`](./.github/workflows/ci.yml): Continual integration pipeline.
 
 ## Setup Instructions
 
@@ -49,20 +51,25 @@ Run the data generator to create a batch of JSON logs.
 ```bash
 python generate_logs.py
 ```
-*You can view the new files in the `data/raw` folder.*
 
 ### 3. Run the PySpark ETL
 Transform the messy JSON data into a clean, partitioned Parquet datalake.
 ```bash
 python local_etl.py
 ```
-*You can view the resulting Parquet files partitioned by year/month/day in the `data/processed` folder.*
 
 ### 4. Query with DuckDB
 Use DuckDB to run advanced analytical SQL queries (`duckdb_queries.py`) against the Parquet directory structure to find the "Impossible Travel" anomalies in milliseconds.
 ```bash
 python duckdb_queries.py
 ```
+
+### 5. Launch the Live Analytics Dashboard (Streamlit)
+Spin up the interactive web frontend to view the data engine visually:
+```bash
+streamlit run dashboard.py
+```
+This will automatically open a browser window displaying the Cyber Log threat tracking application.
 
 ## Running Tests
 Run `pytest` to validate the logic of the logs and anomalies.
