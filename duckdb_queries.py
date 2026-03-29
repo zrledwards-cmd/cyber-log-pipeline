@@ -1,10 +1,5 @@
 import duckdb
 import os
-import pandas as pd
-
-# Setting pandas configuration to display all columns nicely
-pd.set_option('display.max_columns', None)
-pd.set_option('display.width', 1000)
 
 PROCESSED_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "processed")
 
@@ -16,7 +11,6 @@ def main():
     print("Connecting to DuckDB memory instance...")
     con = duckdb.connect(database=':memory:')
 
-    # Using DuckDB's native read_parquet function which supports Hive partitioning automatically
     query = f"""
     WITH UserLogins AS (
       SELECT
@@ -38,8 +32,7 @@ def main():
         b.event_time AS login_time_2,
         b.ip_address AS ip_2,
         b.country AS country_2,
-        -- Calculate time difference in minutes
-        date_diff('minute', a.event_time, b.event_time) as minutes_between_logins
+        date_diff('minute', a.event_time, b.event_time) as minutes_between
       FROM UserLogins a
       JOIN UserLogins b
         ON a.user_name = b.user_name
@@ -56,22 +49,24 @@ def main():
       country_2,
       ip_2,
       login_time_2,
-      minutes_between_logins,
+      minutes_between,
       'Impossible Travel' AS alert_reason
     FROM LoginVariations
-    ORDER BY minutes_between_logins ASC;
+    ORDER BY minutes_between ASC;
     """
 
     print("Executing 'Impossible Travel' query against Local Parquet files...")
     
     try:
-        results = con.execute(query).df()
+        # Check if there are rows
+        count_query = f"SELECT count(*) FROM ({query})"
+        count = con.execute(count_query).fetchone()[0]
         
-        if results.empty:
+        if count == 0:
             print("\nNo Impossible Travel events found.")
         else:
             print("\n🔥 ANOMALIES DETECTED 🔥\n")
-            print(results.to_markdown(index=False))
+            con.execute(query).show()
     except Exception as e:
         print(f"An error occurred querying DuckDB: {e}")
 
