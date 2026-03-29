@@ -7,7 +7,7 @@ import plotly.express as px
 # -------------------------------------------------------------
 # Configuration & Theming
 # -------------------------------------------------------------
-st.set_page_config(page_title="CIPHER | Threat Analytics", page_icon="🔐", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="SENTINEL | Threat Analytics", page_icon="🛡️", layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown("""
 <style>
@@ -88,7 +88,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="title-container"><h1 class="neon-text">🔐 CIPHER</h1><p class="subtitle">Real-time Impossible Travel Detection & Geolocation Analytics</p></div>', unsafe_allow_html=True)
+st.markdown('<div class="title-container"><h1 class="neon-text">🛡️ SENTINEL</h1><p class="subtitle">Real-time Impossible Travel Detection & Geolocation Analytics</p></div>', unsafe_allow_html=True)
 
 # -------------------------------------------------------------
 # Data Processing (DuckDB)
