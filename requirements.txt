@@ -1,6 +1,6 @@
 pytest
 flake8
-pyspark
 duckdb
 streamlit
 pandas
+plotly
